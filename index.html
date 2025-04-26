@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tiger Trading Post Calculator</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tiger Trading Post</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>Tiger Trading Post</h1>
-    <div id="items" class="item-grid"></div>
-    <div class="total">
-      <h2>Total: $<span id="total">0.00</span></h2>
-      <button id="reset">Reset</button>
+    <div class="main">
+      <div id="items" class="item-grid"></div>
+      <div class="receipt">
+        <h2>Receipt</h2>
+        <div id="receipt-items" class="receipt-items"></div>
+        <hr />
+        <h3>Total: $<span id="total">0.00</span></h3>
+        <button id="reset">Reset</button>
+      </div>
     </div>
   </div>
 
