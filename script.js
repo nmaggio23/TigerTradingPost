@@ -17,45 +17,84 @@ const items = [
   { name: "Charging Bundle", price: 12.00 },
 ];
 
-let total = 0;
 let cart = {};
+let total = 0;
 
-const itemsDiv = document.getElementById("items");
 const totalDisplay = document.getElementById("total");
 const receiptDiv = document.getElementById("receipt-items");
+const itemsDiv = document.getElementById("items");
 
 function updateReceipt() {
   receiptDiv.innerHTML = "";
   total = 0;
 
   for (const [itemName, { quantity, price }] of Object.entries(cart)) {
-    const lineTotal = price * quantity;
+    const lineTotal = quantity * price;
     total += lineTotal;
 
-    const itemLine = document.createElement("div");
-    itemLine.textContent = `${itemName} x${quantity} — $${lineTotal.toFixed(2)}`;
-    receiptDiv.appendChild(itemLine);
+    const div = document.createElement("div");
+    div.textContent = `${itemName} x${quantity} — $${lineTotal.toFixed(2)}`;
+    receiptDiv.appendChild(div);
   }
 
   totalDisplay.textContent = total.toFixed(2);
 }
 
-items.forEach(item => {
-  const btn = document.createElement("button");
-  btn.textContent = `${item.name} - $${item.price.toFixed(2)}`;
-  btn.onclick = () => {
-    if (!cart[item.name]) {
-      cart[item.name] = { quantity: 1, price: item.price };
-    } else {
-      cart[item.name].quantity += 1;
-    }
-    updateReceipt();
-  };
-  itemsDiv.appendChild(btn);
-});
-
-document.getElementById("reset").onclick = () => {
-  cart = {};
-  total = 0;
+function addToCart(item) {
+  if (!cart[item.name]) {
+    cart[item.name] = { quantity: 1, price: item.price };
+  } else {
+    cart[item.name].quantity += 1;
+  }
   updateReceipt();
+}
+
+function addCustomItem() {
+  const name = document.getElementById("customName").value.trim();
+  const price = parseFloat(document.getElementById("customPrice").value);
+  if (!name || isNaN(price) || price < 0) return;
+
+  const btn = document.createElement("button");
+  btn.textContent = `${name} - $${price.toFixed(2)}`;
+  btn.onclick = () => addToCart({ name, price });
+  itemsDiv.appendChild(btn);
+  document.getElementById("customName").value = "";
+  document.getElementById("customPrice").value = "";
+}
+
+document.getElementById("sell").onclick = async () => {
+  const name = document.getElementById("cashierName").value.trim();
+  const pass = document.getElementById("cashierPass").value;
+
+  if (!name || !pass || Object.keys(cart).length === 0) {
+    alert("Missing cashier info or empty cart.");
+    return;
+  }
+
+  const payload = {
+    cashier: name,
+    password: pass,
+    cart: cart
+  };
+
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbwt_8QHS8TL-zs-JG1UpAcpSvDpZCvsNkjROwThxYpsvLhDpnCui2Mo4cjZsMINSziBow/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    clearCart();
+    alert("Sale recorded.");
+  } catch (e) {
+    alert("Error sending data.");
+  }
 };
+
+document.getElementById("testSell").onclick = clearCart;
+document.getElementById("clearItems").onclick = clearCart;
+
+function clearCart() {
+  cart = {};
+  updateReceipt();
+}
