@@ -1,7 +1,7 @@
 const items = [
   { name: "Gatorade Zero", price: 3.00 },
   { name: "Izze", price: 2.00 },
-  { name: "Welch’s Fruit Snacks (3 for $1)", price: 1.00},
+  { name: "Welch’s Fruit Snacks (3 for $1)", price: 1.00 / 3 },
   { name: "Baked Chips", price: 2.50 },
   { name: "Cheez-Its", price: 2.00 },
   { name: "Scrunchies (2 for $1)", price: 1.00 / 2 },
@@ -18,21 +18,44 @@ const items = [
 ];
 
 let total = 0;
+let cart = {};
 
-const totalDisplay = document.getElementById("total");
 const itemsDiv = document.getElementById("items");
+const totalDisplay = document.getElementById("total");
+const receiptDiv = document.getElementById("receipt-items");
+
+function updateReceipt() {
+  receiptDiv.innerHTML = "";
+  total = 0;
+
+  for (const [itemName, { quantity, price }] of Object.entries(cart)) {
+    const lineTotal = price * quantity;
+    total += lineTotal;
+
+    const itemLine = document.createElement("div");
+    itemLine.textContent = `${itemName} x${quantity} — $${lineTotal.toFixed(2)}`;
+    receiptDiv.appendChild(itemLine);
+  }
+
+  totalDisplay.textContent = total.toFixed(2);
+}
 
 items.forEach(item => {
   const btn = document.createElement("button");
   btn.textContent = `${item.name} - $${item.price.toFixed(2)}`;
   btn.onclick = () => {
-    total += item.price;
-    totalDisplay.textContent = total.toFixed(2);
+    if (!cart[item.name]) {
+      cart[item.name] = { quantity: 1, price: item.price };
+    } else {
+      cart[item.name].quantity += 1;
+    }
+    updateReceipt();
   };
   itemsDiv.appendChild(btn);
 });
 
 document.getElementById("reset").onclick = () => {
+  cart = {};
   total = 0;
-  totalDisplay.textContent = "0.00";
+  updateReceipt();
 };
