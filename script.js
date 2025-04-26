@@ -49,49 +49,14 @@ function addToCart(item) {
   updateReceipt();
 }
 
-function addCustomItem() {
-  const name = document.getElementById("customName").value.trim();
-  const price = parseFloat(document.getElementById("customPrice").value);
-  if (!name || isNaN(price) || price < 0) return;
-
+items.forEach(item => {
   const btn = document.createElement("button");
-  btn.textContent = `${name} - $${price.toFixed(2)}`;
-  btn.onclick = () => addToCart({ name, price });
+  btn.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+  btn.onclick = () => addToCart(item);
   itemsDiv.appendChild(btn);
-  document.getElementById("customName").value = "";
-  document.getElementById("customPrice").value = "";
-}
+});
 
-document.getElementById("sell").onclick = async () => {
-  const name = document.getElementById("cashierName").value.trim();
-  const pass = document.getElementById("cashierPass").value;
-
-  if (!name || !pass || Object.keys(cart).length === 0) {
-    alert("Missing cashier info or empty cart.");
-    return;
-  }
-
-  const payload = {
-    cashier: name,
-    password: pass,
-    cart: cart
-  };
-
-  try {
-    await fetch("https://script.google.com/macros/s/AKfycbwt_8QHS8TL-zs-JG1UpAcpSvDpZCvsNkjROwThxYpsvLhDpnCui2Mo4cjZsMINSziBow/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    clearCart();
-    alert("Sale recorded.");
-  } catch (e) {
-    alert("Error sending data.");
-  }
-};
-
-document.getElementById("testSell").onclick = clearCart;
+document.getElementById("sell").onclick = clearCart;
 document.getElementById("clearItems").onclick = clearCart;
 
 function clearCart() {
