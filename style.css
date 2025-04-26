@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 1000px;
   margin: 2rem auto;
   padding: 1rem;
   background: #2f3e46;
@@ -19,11 +19,24 @@ h1 {
   color: #ffa500;
 }
 
+.main {
+  display: flex;
+  gap: 2rem;
+}
+
 .item-grid {
+  flex: 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
-  margin-top: 1rem;
+}
+
+.receipt {
+  flex: 1;
+  background-color: #3b4a51;
+  padding: 1rem;
+  border-radius: 8px;
+  height: fit-content;
 }
 
 button {
@@ -36,13 +49,14 @@ button {
   color: black;
   font-weight: bold;
   width: 100%;
+  margin-top: 0.5rem;
 }
 
 button:hover {
   background-color: #e69500;
 }
 
-.total {
-  text-align: center;
-  margin-top: 2rem;
+.receipt-items {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
 }
