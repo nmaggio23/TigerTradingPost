@@ -1,190 +1,616 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Variables
-  const reviews = document.querySelectorAll('.review-card');
-  const reviewsTrack = document.querySelector('.reviews-track');
-  const prevBtn = document.querySelector('.nav-prev');
-  const nextBtn = document.querySelector('.nav-next');
-  const indicatorsContainer = document.querySelector('.carousel-indicators');
-  const dropdowns = document.querySelectorAll('.dropdown');
-  const planRows = document.querySelectorAll('.plan-row');
-  const contactForm = document.getElementById('contactForm');
-  
-  // Set up Reviews Carousel
-  let currentIndex = 0;
-  const totalReviews = reviews.length;
-  const visibleReviews = 2;
-  let isAnimating = false;
-  
-  // Set up the initial carousel position
-  function initCarousel() {
-    reviewsTrack.style.width = `${totalReviews * (100 / visibleReviews)}%`;
-    reviews.forEach(review => {
-      review.style.width = `${100 / totalReviews}%`;
-    });
-    
-    updateCarousel();
-    createIndicators();
+/* GLOBAL THEME */
+:root {
+  --dark-gray: #333333;
+  --light-gray: #f5f5f5;
+  --green: #b7f001;
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
+
+html { 
+  scroll-behavior: smooth; 
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
+               "Helvetica Neue", Arial, sans-serif;
+  color: var(--dark-gray);
+  line-height: 1.5;
+  background: #fff;
+}
+
+/* HEADER */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--dark-gray);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px;
+  z-index: 1000;
+}
+
+.logo-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background-color: #666;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.brand {
+  color: white;
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+nav ul {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+nav a {
+  color: white;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+nav a:hover, nav a.active {
+  background-color: rgba(183, 240, 1, 0.2);
+}
+
+/* MAIN CONTENT */
+main {
+  margin-top: 56px;
+}
+
+/* SECTION STYLING */
+section {
+  padding: 40px 20px;
+  border-top: 4px solid rgba(183, 240, 1, 0.2);
+}
+
+section:first-of-type {
+  border-top: none;
+}
+
+h2 {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  position: relative;
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+}
+
+h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background-color: var(--green);
+}
+
+.btn {
+  background-color: var(--green);
+  color: var(--dark-gray);
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover {
+  background-color: rgba(183, 240, 1, 0.8);
+}
+
+/* HOME SECTION */
+#home {
+  height: calc(100vh - 56px);
+  background: url('assets/img/hero.jpg') center/cover no-repeat;
+  position: relative;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#home .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.hero-logo-container {
+  margin-bottom: 20px;
+}
+
+.hero-logo {
+  width: 150px;
+  height: 150px;
+  background-color: #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+}
+
+#home h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+#home p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+/* PROJECTS SECTION */
+.projects-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.project-image {
+  flex: 1 1 calc(33.333% - 40px);
+  min-width: 250px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 6px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.project-image:hover {
+  transform: scale(1.03);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.project-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* REVIEWS SECTION */
+.reviews-container {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.reviews-wrapper {
+  overflow: hidden;
+}
+
+.reviews-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.review-card {
+  flex: 0 0 calc(50% - 10px);
+  background-color: white;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 0 10px;
+}
+
+.stars {
+  color: #FFD700;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.review-link {
+  display: inline-block;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9em;
+  margin: 10px 0;
+}
+
+.review-footer {
+  color: #666;
+  font-size: 0.8em;
+}
+
+.carousel-nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.nav-prev, .nav-next {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--dark-gray);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 1.2em;
+}
+
+.nav-prev:hover, .nav-next:hover {
+  background-color: var(--green);
+  color: var(--dark-gray);
+}
+
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.indicator.active {
+  background-color: var(--green);
+}
+
+.read-more {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.read-more a {
+  color: #666;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* ADVANTAGE SECTION */
+.advantage-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.advantage-card {
+  flex: 1 1 calc(33.333% - 40px);
+  min-width: 250px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.advantage-card h3 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.advantage-card p {
+  margin-bottom: 15px;
+}
+
+/* ABOUT SECTION */
+.about-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.dropdown {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.dropdown:last-child {
+  margin-bottom: 0;
+}
+
+.dropdown-header {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  background: #f5f5f5;
+}
+
+.dropdown-icon {
+  font-size: 1.2em;
+  transition: transform 0.4s ease;
+}
+
+.dropdown.open .dropdown-icon {
+  transform: rotate(45deg);
+}
+
+.dropdown-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), padding 0.4s ease;
+  padding: 0 15px;
+}
+
+.dropdown.open .dropdown-content {
+  max-height: 1000px;
+  padding: 20px 15px;
+  transition: max-height 0.6s ease-in-out, padding 0.4s ease;
+}
+
+/* SERVICES SECTION */
+.services-container {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.service-block {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.block-header {
+  background: var(--dark-gray);
+  color: white;
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.service-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.service-row:last-child {
+  border-bottom: none;
+}
+
+.service-row.even {
+  background: #f5f5f5;
+}
+
+.service-name {
+  font-weight: 500;
+}
+
+.service-description {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.service-price {
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Plan Rows */
+.plan-row {
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.plan-row:last-child {
+  border-bottom: none;
+}
+
+.plan-row.even {
+  background: #f5f5f5;
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  align-items: center;
+}
+
+.plan-name {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.plan-toggle {
+  margin-left: 8px;
+  font-size: 18px;
+}
+
+.plan-price {
+  font-weight: 600;
+}
+
+.popular-tag {
+  display: inline-block;
+  background: var(--green);
+  color: var(--dark-gray);
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+
+.plan-details {
+  padding: 15px 20px;
+  background: #f5f5f5;
+  border-top: 1px solid #eee;
+  font-size: 15px;
+  color: #555;
+  display: none;
+}
+
+.plan-row.active .plan-details {
+  display: block;
+}
+
+.plans-note {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* CONTACT FORM */
+.contact-form {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row.two-cols .form-group {
+  flex: 1;
+}
+
+.form-row.three-cols .form-group {
+  flex: 1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full {
+  flex: 1;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.form-group input, .form-group textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-group input.error {
+  border-color: red;
+}
+
+.form-group small {
+  margin-top: 4px;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.contact-form h3 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.send-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* FOOTER */
+footer {
+  background-color: var(--dark-gray);
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .projects-grid, .advantage-grid {
+    flex-direction: column;
   }
   
-  // Update carousel position
-  function updateCarousel() {
-    if (isAnimating) return;
-    
-    isAnimating = true;
-    
-    // Calculate the percentage to move
-    const movePercentage = -(currentIndex * (100 / totalReviews));
-    
-    // Apply the transform
-    reviewsTrack.style.transform = `translateX(${movePercentage}%)`;
-    
-    // Update indicators
-    updateIndicators();
-    
-    // Reset animation flag after transition
-    setTimeout(() => {
-      isAnimating = false;
-    }, 500);
+  .form-row.two-cols, .form-row.three-cols {
+    flex-direction: column;
   }
   
-  // Create carousel indicators
-  function createIndicators() {
-    const indicatorsCount = Math.ceil(totalReviews / visibleReviews);
-    
-    for (let i = 0; i < indicatorsCount; i++) {
-      const indicator = document.createElement('div');
-      indicator.classList.add('indicator');
-      
-      if (i === 0) {
-        indicator.classList.add('active');
-      }
-      
-      indicator.addEventListener('click', () => {
-        if (isAnimating) return;
-        currentIndex = i * visibleReviews;
-        updateCarousel();
-      });
-      
-      indicatorsContainer.appendChild(indicator);
-    }
+  .review-card {
+    flex: 0 0 calc(100% - 20px);
   }
   
-  // Update carousel indicators
-  function updateIndicators() {
-    const indicators = document.querySelectorAll('.indicator');
-    const activeIndex = Math.floor(currentIndex / visibleReviews);
-    
-    indicators.forEach((indicator, index) => {
-      if (index === activeIndex) {
-        indicator.classList.add('active');
-      } else {
-        indicator.classList.remove('active');
-      }
-    });
+  .reviews-track {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
-  
-  // Event Listeners for carousel navigation
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      if (isAnimating) return;
-      currentIndex = Math.max(currentIndex - visibleReviews, 0);
-      updateCarousel();
-    });
-  }
-  
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      if (isAnimating) return;
-      currentIndex = Math.min(currentIndex + visibleReviews, totalReviews - visibleReviews);
-      updateCarousel();
-    });
-  }
-  
-  // About section dropdowns
-  dropdowns.forEach(dropdown => {
-    const header = dropdown.querySelector('.dropdown-header');
-    
-    header.addEventListener('click', () => {
-      dropdown.classList.toggle('open');
-    });
-  });
-  
-  // Service plan dropdowns
-  planRows.forEach(row => {
-    row.addEventListener('click', () => {
-      // Toggle the clicked row
-      row.classList.toggle('active');
-      
-      // Close other rows
-      planRows.forEach(otherRow => {
-        if (otherRow !== row && otherRow.classList.contains('active')) {
-          otherRow.classList.remove('active');
-        }
-      });
-    });
-  });
-  
-  // Form validation
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      let isValid = true;
-      const requiredFields = contactForm.querySelectorAll('[required]');
-      
-      requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-          isValid = false;
-          field.classList.add('error');
-        } else {
-          field.classList.remove('error');
-        }
-      });
-      
-      if (isValid) {
-        alert('Thank you for your message! We will be in touch soon.');
-        // In a real implementation, you would submit the form data here
-        contactForm.reset();
-      } else {
-        alert('Please fill out all required fields marked with *');
-      }
-    });
-  }
-  
-  // Smooth scrolling for navigation links
-  const navLinks = document.querySelectorAll('nav a');
-  
-  navLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      // Remove active class from all links
-      navLinks.forEach(navLink => {
-        navLink.classList.remove('active');
-      });
-      
-      // Add active class to clicked link
-      this.classList.add('active');
-      
-      const targetId = this.getAttribute('href');
-      const targetSection = document.querySelector(targetId);
-      
-      if (targetSection) {
-        // Calculate scroll position accounting for fixed header
-        const headerHeight = document.querySelector('header').offsetHeight;
-        const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - headerHeight;
-        
-        // Smooth scroll to target
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        });
-      }
-    });
-  });
-  
-  // Initialize carousel if it exists
-  if (reviewsTrack && reviews.length > 0) {
-    initCarousel();
-  }
-});
+}
