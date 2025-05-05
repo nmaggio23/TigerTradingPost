@@ -1,159 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Variables
-  const reviews = document.querySelectorAll('.review-card');
-  const reviewsTrack = document.querySelector('.reviews-track');
-  const prevBtn = document.querySelector('.nav-prev');
-  const nextBtn = document.querySelector('.nav-next');
-  const indicatorsContainer = document.querySelector('.carousel-indicators');
+  const navLinks = document.querySelectorAll('.nav-link');
   const dropdowns = document.querySelectorAll('.dropdown');
   const planRows = document.querySelectorAll('.plan-row');
+  const reviewsSlider = document.querySelector('.reviews-slider');
+  const reviewsArray = document.querySelectorAll('.review-card');
+  const prevButton = document.querySelector('.carousel-arrow.prev');
+  const nextButton = document.querySelector('.carousel-arrow.next');
+  const dotsContainer = document.querySelector('.carousel-dots');
   const contactForm = document.getElementById('contactForm');
   
-  // Set up Reviews Carousel
-  let currentIndex = 0;
-  const totalReviews = reviews.length;
-  const visibleReviews = 2;
+  let currentReviewIndex = 0;
   let isAnimating = false;
   
-  // Set up the initial carousel position
-  function initCarousel() {
-    reviewsTrack.style.width = `${totalReviews * (100 / visibleReviews)}%`;
-    reviews.forEach(review => {
-      review.style.width = `${100 / totalReviews}%`;
-    });
-    
-    updateCarousel();
-    createIndicators();
-  }
-  
-  // Update carousel position
-  function updateCarousel() {
-    if (isAnimating) return;
-    
-    isAnimating = true;
-    
-    // Calculate the percentage to move
-    const movePercentage = -(currentIndex * (100 / totalReviews));
-    
-    // Apply the transform
-    reviewsTrack.style.transform = `translateX(${movePercentage}%)`;
-    
-    // Update indicators
-    updateIndicators();
-    
-    // Reset animation flag after transition
-    setTimeout(() => {
-      isAnimating = false;
-    }, 500);
-  }
-  
-  // Create carousel indicators
-  function createIndicators() {
-    const indicatorsCount = Math.ceil(totalReviews / visibleReviews);
-    
-    for (let i = 0; i < indicatorsCount; i++) {
-      const indicator = document.createElement('div');
-      indicator.classList.add('indicator');
-      
-      if (i === 0) {
-        indicator.classList.add('active');
-      }
-      
-      indicator.addEventListener('click', () => {
-        if (isAnimating) return;
-        currentIndex = i * visibleReviews;
-        updateCarousel();
-      });
-      
-      indicatorsContainer.appendChild(indicator);
-    }
-  }
-  
-  // Update carousel indicators
-  function updateIndicators() {
-    const indicators = document.querySelectorAll('.indicator');
-    const activeIndex = Math.floor(currentIndex / visibleReviews);
-    
-    indicators.forEach((indicator, index) => {
-      if (index === activeIndex) {
-        indicator.classList.add('active');
-      } else {
-        indicator.classList.remove('active');
-      }
-    });
-  }
-  
-  // Event Listeners for carousel navigation
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      if (isAnimating) return;
-      currentIndex = Math.max(currentIndex - visibleReviews, 0);
-      updateCarousel();
-    });
-  }
-  
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      if (isAnimating) return;
-      currentIndex = Math.min(currentIndex + visibleReviews, totalReviews - visibleReviews);
-      updateCarousel();
-    });
-  }
-  
-  // About section dropdowns
-  dropdowns.forEach(dropdown => {
-    const header = dropdown.querySelector('.dropdown-header');
-    
-    header.addEventListener('click', () => {
-      dropdown.classList.toggle('open');
-    });
-  });
-  
-  // Service plan dropdowns
-  planRows.forEach(row => {
-    row.addEventListener('click', () => {
-      // Toggle the clicked row
-      row.classList.toggle('active');
-      
-      // Close other rows
-      planRows.forEach(otherRow => {
-        if (otherRow !== row && otherRow.classList.contains('active')) {
-          otherRow.classList.remove('active');
-        }
-      });
-    });
-  });
-  
-  // Form validation
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      let isValid = true;
-      const requiredFields = contactForm.querySelectorAll('[required]');
-      
-      requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-          isValid = false;
-          field.classList.add('error');
-        } else {
-          field.classList.remove('error');
-        }
-      });
-      
-      if (isValid) {
-        alert('Thank you for your message! We will be in touch soon.');
-        // In a real implementation, you would submit the form data here
-        contactForm.reset();
-      } else {
-        alert('Please fill out all required fields marked with *');
-      }
-    });
-  }
-  
-  // Smooth scrolling for navigation links
-  const navLinks = document.querySelectorAll('nav a');
-  
+  // Navigation Highlighting & Smooth Scrolling
   navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
@@ -183,8 +43,150 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Initialize carousel if it exists
-  if (reviewsTrack && reviews.length > 0) {
-    initCarousel();
+  // About Section Dropdowns
+  dropdowns.forEach(dropdown => {
+    const header = dropdown.querySelector('.dropdown-header');
+    
+    header.addEventListener('click', () => {
+      dropdown.classList.toggle('open');
+    });
+  });
+  
+  // Service Plan Rows
+  planRows.forEach(row => {
+    const header = row.querySelector('.plan-header');
+    
+    header.addEventListener('click', () => {
+      // Toggle active state
+      row.classList.toggle('active');
+      
+      // Close other plans
+      planRows.forEach(otherRow => {
+        if (otherRow !== row && otherRow.classList.contains('active')) {
+          otherRow.classList.remove('active');
+        }
+      });
+    });
+  });
+  
+  // Setup Carousel
+  function setupCarousel() {
+    if (!reviewsSlider || reviewsArray.length === 0) return;
+    
+    // Create dots
+    const totalDots = Math.ceil(reviewsArray.length / 2);
+    
+    for (let i = 0; i < totalDots; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (i === 0) dot.classList.add('active');
+      
+      dot.addEventListener('click', () => {
+        if (isAnimating) return;
+        
+        currentReviewIndex = i * 2;
+        updateCarousel();
+      });
+      
+      dotsContainer.appendChild(dot);
+    }
+    
+    // Position slider to show first two reviews
+    updateCarousel();
   }
+  
+  // Update Carousel
+  function updateCarousel() {
+    if (isAnimating || !reviewsSlider) return;
+    
+    isAnimating = true;
+    
+    // Calculate position
+    const position = -(currentReviewIndex * 50) + '%';
+    
+    // Apply transition
+    reviewsSlider.style.transform = `translateX(${position})`;
+    
+    // Update dots
+    const dots = document.querySelectorAll('.dot');
+    const activeDotIndex = Math.floor(currentReviewIndex / 2);
+    
+    dots.forEach((dot, index) => {
+      if (index === activeDotIndex) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+    
+    // Reset animation flag
+    setTimeout(() => {
+      isAnimating = false;
+    }, 500);
+  }
+  
+  // Next button
+  if (nextButton) {
+    nextButton.addEventListener('click', () => {
+      if (isAnimating) return;
+      
+      const maxIndex = reviewsArray.length - 2;
+      currentReviewIndex = currentReviewIndex >= maxIndex ? 0 : currentReviewIndex + 2;
+      
+      // Add animation class
+      reviewsSlider.classList.add('slide-left');
+      
+      setTimeout(() => {
+        reviewsSlider.classList.remove('slide-left');
+        updateCarousel();
+      }, 50);
+    });
+  }
+  
+  // Previous button
+  if (prevButton) {
+    prevButton.addEventListener('click', () => {
+      if (isAnimating) return;
+      
+      const maxIndex = reviewsArray.length - 2;
+      currentReviewIndex = currentReviewIndex <= 0 ? maxIndex : currentReviewIndex - 2;
+      
+      // Add animation class
+      reviewsSlider.classList.add('slide-right');
+      
+      setTimeout(() => {
+        reviewsSlider.classList.remove('slide-right');
+        updateCarousel();
+      }, 50);
+    });
+  }
+  
+  // Form Validation
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      let isValid = true;
+      const requiredFields = contactForm.querySelectorAll('[required]');
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.classList.add('error');
+        } else {
+          field.classList.remove('error');
+        }
+      });
+      
+      if (isValid) {
+        alert('Thank you for your message! We will be in touch soon.');
+        contactForm.reset();
+      } else {
+        alert('Please fill out all required fields marked with *');
+      }
+    });
+  }
+  
+  // Initialize carousel
+  setupCarousel();
 });
